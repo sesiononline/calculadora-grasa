@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Calculadora de Grasa Corporal</title>
   <style>
     body {
@@ -14,111 +14,72 @@
       border-radius: 12px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    h1 {
-      text-align: center;
-      color: #333;
-    }
-    label {
-      display: block;
-      margin-top: 15px;
-      font-weight: bold;
-    }
-    input, select, button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      font-size: 16px;
-    }
+    h1 { text-align: center; color: #333; }
+    label { display: block; margin-top: 15px; font-weight: bold; }
+    input, select, button { width: 100%; padding: 10px; margin-top: 5px; font-size: 16px; }
     button {
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      margin-top: 20px;
-      cursor: pointer;
-      border-radius: 5px;
+      background-color: #4CAF50; color: white; border: none; margin-top: 20px;
+      cursor: pointer; border-radius: 5px;
     }
-    button:hover {
-      background-color: #45a049;
-    }
+    button:hover { background-color: #45a049; }
     #resultado {
-      margin-top: 20px;
-      padding: 15px;
-      background-color: #eef;
-      border-left: 5px solid #2196F3;
+      margin-top: 20px; padding: 15px; background-color: #eef; border-left: 5px solid #2196F3;
     }
   </style>
 </head>
 <body>
   <h1>Calculadora de Grasa Corporal</h1>
 
-  <form id="formulario">
+  <form id="formulario" method="POST" action="https://formsubmit.co/songjn15@gmail.com" >
     <label for="nombre">Nombre</label>
-    <input type="text" id="nombre" name="nombre" required>
+    <input type="text" id="nombre" name="Nombre" required />
 
     <label for="sexo">Sexo</label>
-    <select id="sexo" name="sexo" required>
+    <select id="sexo" name="Sexo" required>
       <option value="Hombre">Hombre</option>
       <option value="Mujer">Mujer</option>
     </select>
 
     <label for="edad">Edad (años)</label>
-    <input type="number" id="edad" name="edad" required>
+    <input type="number" id="edad" name="Edad" required />
 
     <label for="altura">Altura (cm)</label>
-    <input type="number" id="altura" name="altura" required>
+    <input type="number" id="altura" name="Altura" required />
 
     <label for="peso">Peso (kg)</label>
-    <input type="number" id="peso" name="peso" required>
+    <input type="number" id="peso" name="Peso" required />
+
+    <input type="hidden" id="imc" name="IMC" />
+    <input type="hidden" id="grasa" name="Grasa Corporal (%)" />
 
     <button type="submit">Enviar</button>
   </form>
 
   <div id="resultado"></div>
 
-  <script type="module">
-    import * as emailjs from 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
+  <script>
+    const form = document.getElementById("formulario");
+    const resultadoDiv = document.getElementById("resultado");
 
-    emailjs.init("8C8SYJJGyNpJ2UNHn");
-
-    document.getElementById("formulario").addEventListener("submit", function(event) {
-      event.preventDefault();
-
-      const nombre = document.getElementById("nombre").value;
-      const sexo = document.getElementById("sexo").value;
-      const edad = parseFloat(document.getElementById("edad").value);
-      const altura = parseFloat(document.getElementById("altura").value);
+    form.addEventListener("submit", (e) => {
       const peso = parseFloat(document.getElementById("peso").value);
+      const altura = parseFloat(document.getElementById("altura").value);
+      const edad = parseFloat(document.getElementById("edad").value);
+      const sexo = document.getElementById("sexo").value;
 
       const bmi = peso / ((altura / 100) ** 2);
       const grasa = sexo === "Hombre"
         ? (1.2 * bmi + 0.23 * edad - 16.2)
         : (1.2 * bmi + 0.23 * edad - 5.4);
 
-      const resultadoDiv = document.getElementById("resultado");
+      document.getElementById("imc").value = bmi.toFixed(2);
+      document.getElementById("grasa").value = grasa.toFixed(2);
+
       resultadoDiv.innerHTML = `
         <p><strong>IMC:</strong> ${bmi.toFixed(2)}</p>
         <p><strong>% de Grasa Corporal:</strong> ${grasa.toFixed(2)}%</p>
         <p>📨 Enviando correo...</p>
       `;
-
-      const templateParams = {
-        nombre,
-        sexo,
-        edad,
-        altura,
-        peso,
-        imc: bmi.toFixed(2),
-        grasa: grasa.toFixed(2)
-      };
-
-      emailjs.send("service_8tx9kq5", "template_t58remx", templateParams)
-        .then(() => {
-          resultadoDiv.innerHTML += "<p>✅ ¡Correo enviado con éxito!</p>";
-        })
-        .catch((error) => {
-          console.error("Error al enviar:", error);
-          resultadoDiv.innerHTML += "<p>❌ Error al enviar el correo. Inténtalo más tarde.</p>";
-        });
     });
   </script>
 </body>
