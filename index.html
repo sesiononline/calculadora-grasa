@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Calculadora de Grasa Corporal</title>
-  <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -37,7 +36,6 @@
       margin-top: 20px;
       cursor: pointer;
       border-radius: 5px;
-      transition: background 0.2s ease;
     }
     button:hover {
       background-color: #45a049;
@@ -72,24 +70,21 @@
     <label for="peso">Peso (kg)</label>
     <input type="number" id="peso" name="peso" required>
 
-    <button type="submit" id="btnEnviar">Enviar</button>
+    <button type="submit">Enviar</button>
   </form>
 
   <div id="resultado"></div>
 
-  <script>
-    // Inicializa EmailJS
-    emailjs.init("8C8SYJJGyNpJ2UNHn");
+  <!-- ✅ 使用 EmailJS v4 SDK -->
+  <script type="module">
+    import emailjs from 'https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js';
 
-    const form = document.getElementById("formulario");
-    const btnEnviar = document.getElementById("btnEnviar");
-    const resultado = document.getElementById("resultado");
+    emailjs.init({
+      publicKey: "8C8SYJJGyNpJ2UNHn" // 你的 Public Key
+    });
 
-    form.addEventListener("submit", function(event) {
+    document.getElementById("formulario").addEventListener("submit", function(event) {
       event.preventDefault();
-
-      btnEnviar.disabled = true;
-      resultado.innerHTML = "⏳ Calculando y enviando correo...";
 
       const nombre = document.getElementById("nombre").value;
       const sexo = document.getElementById("sexo").value;
@@ -102,6 +97,13 @@
         ? (1.2 * bmi + 0.23 * edad - 16.2)
         : (1.2 * bmi + 0.23 * edad - 5.4);
 
+      const resultadoDiv = document.getElementById("resultado");
+      resultadoDiv.innerHTML = `
+        <p><strong>IMC:</strong> ${bmi.toFixed(2)}</p>
+        <p><strong>% de Grasa Corporal:</strong> ${grasa.toFixed(2)}%</p>
+        <p>📨 Enviando correo...</p>
+      `;
+
       const templateParams = {
         nombre,
         sexo,
@@ -109,25 +111,16 @@
         altura,
         peso,
         imc: bmi.toFixed(2),
-        grasa: grasa.toFixed(2),
-        time: new Date().toLocaleString("es-ES")
+        grasa: grasa.toFixed(2)
       };
 
       emailjs.send("service_8tx9kq5", "template_t58remx", templateParams)
         .then(() => {
-          resultado.innerHTML = `
-            ✅ <strong>Correo enviado con éxito.</strong><br>
-            <strong>IMC:</strong> ${bmi.toFixed(2)}<br>
-            <strong>% de Grasa Corporal:</strong> ${grasa.toFixed(2)}%
-          `;
-          form.reset();
+          resultadoDiv.innerHTML += "<p>✅ ¡Correo enviado con éxito!</p>";
         })
         .catch((error) => {
-          console.error("Error:", error);
-          resultado.innerHTML = "❌ Error al enviar el correo. Inténtalo más tarde.";
-        })
-        .finally(() => {
-          btnEnviar.disabled = false;
+          console.error("Error al enviar:", error);
+          resultadoDiv.innerHTML += "<p>❌ Error al enviar el correo. Inténtalo más tarde.</p>";
         });
     });
   </script>
