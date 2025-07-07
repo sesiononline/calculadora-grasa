@@ -75,13 +75,10 @@
 
   <div id="resultado"></div>
 
-  <!-- ✅ 使用 EmailJS v4 SDK -->
   <script type="module">
     import emailjs from 'https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js';
 
-    emailjs.init({
-      publicKey: "8C8SYJJGyNpJ2UNHn" // 你的 Public Key
-    });
+    emailjs.init("8C8SYJJGyNpJ2UNHn"); // 你的Public Key，注意直接传字符串
 
     document.getElementById("formulario").addEventListener("submit", function(event) {
       event.preventDefault();
