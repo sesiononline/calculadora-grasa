@@ -76,9 +76,9 @@
   <div id="resultado"></div>
 
   <script type="module">
-    import emailjs from 'https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js';
+    import * as emailjs from 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
 
-    emailjs.init("8C8SYJJGyNpJ2UNHn"); // 你的Public Key，注意直接传字符串
+    emailjs.init("8C8SYJJGyNpJ2UNHn");
 
     document.getElementById("formulario").addEventListener("submit", function(event) {
       event.preventDefault();
