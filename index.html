@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Calculadora de Grasa Corporal</title>
+  <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -50,28 +51,25 @@
 </head>
 <body>
   <h1>Calculadora de Grasa Corporal</h1>
-  <form action="https://formsubmit.co/songjn15@gmail.com" method="POST" onsubmit="return calcularEnviar(event)">
+
+  <form id="formulario">
     <label for="nombre">Nombre</label>
-    <input type="text" name="Nombre" id="nombre" required>
+    <input type="text" id="nombre" name="nombre" required>
 
     <label for="sexo">Sexo</label>
-    <select name="Sexo" id="sexo" required>
+    <select id="sexo" name="sexo" required>
       <option value="Hombre">Hombre</option>
       <option value="Mujer">Mujer</option>
     </select>
 
     <label for="edad">Edad (años)</label>
-    <input type="number" name="Edad" id="edad" required min="1">
+    <input type="number" id="edad" name="edad" required>
 
     <label for="altura">Altura (cm)</label>
-    <input type="number" name="Altura" id="altura" required min="50">
+    <input type="number" id="altura" name="altura" required>
 
     <label for="peso">Peso (kg)</label>
-    <input type="number" name="Peso" id="peso" required min="10">
-
-    <!-- Campos ocultos para enviar los resultados -->
-    <input type="hidden" name="IMC" id="hiddenIMC">
-    <input type="hidden" name="GrasaCorporal" id="hiddenGrasa">
+    <input type="number" id="peso" name="peso" required>
 
     <button type="submit">Enviar</button>
   </form>
@@ -79,35 +77,49 @@
   <div id="resultado"></div>
 
   <script>
-    function calcularEnviar(event) {
+    // Inicializa EmailJS con tu clave pública
+    emailjs.init("8C8SYJJGyNpJ2UNHn");
+
+    document.getElementById("formulario").addEventListener("submit", function(event) {
       event.preventDefault();
 
+      const nombre = document.getElementById("nombre").value;
       const sexo = document.getElementById("sexo").value;
       const edad = parseFloat(document.getElementById("edad").value);
       const altura = parseFloat(document.getElementById("altura").value);
       const peso = parseFloat(document.getElementById("peso").value);
-
-      if (!edad || !altura || !peso) {
-        alert("Por favor, completa todos los campos.");
-        return false;
-      }
 
       const bmi = peso / ((altura / 100) ** 2);
       const grasa = sexo === "Hombre"
         ? (1.2 * bmi + 0.23 * edad - 16.2)
         : (1.2 * bmi + 0.23 * edad - 5.4);
 
+      // Muestra resultados en la página
       document.getElementById("resultado").innerHTML = `
         <p><strong>IMC:</strong> ${bmi.toFixed(2)}</p>
-        <p><strong>Porcentaje estimado de grasa corporal:</strong> ${grasa.toFixed(2)}%</p>
+        <p><strong>% de Grasa Corporal:</strong> ${grasa.toFixed(2)}%</p>
+        <p>📨 Enviando correo...</p>
       `;
 
-      document.getElementById("hiddenIMC").value = bmi.toFixed(2);
-      document.getElementById("hiddenGrasa").value = grasa.toFixed(2);
+      // Prepara parámetros para EmailJS
+      const templateParams = {
+        nombre,
+        sexo,
+        edad,
+        altura,
+        peso,
+        imc: bmi.toFixed(2),
+        grasa: grasa.toFixed(2)
+      };
 
-      // Enviar formulario después del cálculo
-      event.target.submit();
-    }
+      emailjs.send("service_8tx9kq5", "template_r2v3ftz", templateParams)
+        .then(() => {
+          document.getElementById("resultado").innerHTML += "<p>✅ ¡Correo enviado con éxito!</p>";
+        }, (error) => {
+          console.error("Error al enviar:", error);
+          document.getElementById("resultado").innerHTML += "<p>❌ Error al enviar el correo.</p>";
+        });
+    });
   </script>
 </body>
 </html>
