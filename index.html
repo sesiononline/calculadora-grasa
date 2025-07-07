@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Calculadora de Grasa Corporal</title>
   <style>
     body {
@@ -14,49 +14,61 @@
       border-radius: 12px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    h1 { text-align: center; color: #333; }
-    label { display: block; margin-top: 15px; font-weight: bold; }
-    input, select, button { width: 100%; padding: 10px; margin-top: 5px; font-size: 16px; }
-    button {
-      background-color: #4CAF50; color: white; border: none; margin-top: 20px;
-      cursor: pointer; border-radius: 5px;
-      transition: background-color 0.3s ease;
+    h1 {
+      text-align: center;
+      color: #333;
     }
-    button:hover:not(:disabled) { background-color: #45a049; }
-    button:disabled {
-      background-color: #999;
-      cursor: not-allowed;
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      font-size: 16px;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      margin-top: 20px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    button:hover {
+      background-color: #45a049;
     }
     #resultado {
-      margin-top: 20px; padding: 15px; background-color: #eef; border-left: 5px solid #2196F3;
-      white-space: pre-line;
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #eef;
+      border-left: 5px solid #2196F3;
     }
   </style>
 </head>
 <body>
   <h1>Calculadora de Grasa Corporal</h1>
 
-  <form id="formulario" method="POST" action="https://formsubmit.co/ajax/songjn15@gmail.com" >
+  <form id="formulario">
     <label for="nombre">Nombre</label>
-    <input type="text" id="nombre" name="Nombre" required />
+    <input type="text" id="nombre" name="nombre" required>
 
     <label for="sexo">Sexo</label>
-    <select id="sexo" name="Sexo" required>
+    <select id="sexo" name="sexo" required>
       <option value="Hombre">Hombre</option>
       <option value="Mujer">Mujer</option>
     </select>
 
     <label for="edad">Edad (años)</label>
-    <input type="number" id="edad" name="Edad" required />
+    <input type="number" id="edad" name="edad" required>
 
     <label for="altura">Altura (cm)</label>
-    <input type="number" id="altura" name="Altura" required />
+    <input type="number" id="altura" name="altura" required>
 
     <label for="peso">Peso (kg)</label>
-    <input type="number" id="peso" name="Peso" required />
-
-    <input type="hidden" id="imc" name="IMC" />
-    <input type="hidden" id="grasa" name="Grasa Corporal (%)" />
+    <input type="number" id="peso" name="peso" required>
 
     <button type="submit" id="submitBtn">Enviar</button>
   </form>
@@ -64,64 +76,40 @@
   <div id="resultado"></div>
 
   <script>
-    const form = document.getElementById("formulario");
+    const formulario = document.getElementById("formulario");
     const resultadoDiv = document.getElementById("resultado");
     const submitBtn = document.getElementById("submitBtn");
 
-    form.addEventListener("submit", async (e) => {
+    const scriptURL = "https://script.google.com/macros/s/AKfycbyTcULkwMmHJ0vumW_6AEYwD3wLiaGOm8ixiTzRKKMZqCBEIYaheTVXTbiLFVEi-QbWQg/exec";
+
+    formulario.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      // 计算体脂
-      const peso = parseFloat(document.getElementById("peso").value);
-      const altura = parseFloat(document.getElementById("altura").value);
-      const edad = parseFloat(document.getElementById("edad").value);
+      const nombre = document.getElementById("nombre").value;
       const sexo = document.getElementById("sexo").value;
+      const edad = parseFloat(document.getElementById("edad").value);
+      const altura = parseFloat(document.getElementById("altura").value);
+      const peso = parseFloat(document.getElementById("peso").value);
 
-      const bmi = peso / ((altura / 100) ** 2);
+      // 计算 BMI 和体脂率
+      const imc = peso / ((altura / 100) ** 2);
       const grasa = sexo === "Hombre"
-        ? (1.2 * bmi + 0.23 * edad - 16.2)
-        : (1.2 * bmi + 0.23 * edad - 5.4);
+        ? (1.2 * imc + 0.23 * edad - 16.2)
+        : (1.2 * imc + 0.23 * edad - 5.4);
 
-      // 填入隐藏字段
-      document.getElementById("imc").value = bmi.toFixed(2);
-      document.getElementById("grasa").value = grasa.toFixed(2);
+      // 结果显示在页面上
+      resultadoDiv.innerHTML = `
+        <p><strong>IMC:</strong> ${imc.toFixed(2)}</p>
+        <p><strong>% de Grasa Corporal:</strong> ${grasa.toFixed(2)}%</p>
+        <p>📨 Enviando datos al documento...</p>
+      `;
 
-      // 禁用按钮并改文字
-      submitBtn.disabled = true;
-      submitBtn.textContent = "Enviando...";
-
-      resultadoDiv.textContent = "📨 Enviando correo...";
-
-      const formData = new FormData(form);
-
-      try {
-        const response = await fetch(form.action, {
-          method: 'POST',
-          body: formData,
-          headers: {
-            'Accept': 'application/json'
-          }
-        });
-
-        if (response.ok) {
-          resultadoDiv.innerHTML = `
-            <p>✅ ¡Correo enviado con éxito!</p>
-            <p><strong>IMC:</strong> ${bmi.toFixed(2)}</p>
-            <p><strong>% de Grasa Corporal:</strong> ${grasa.toFixed(2)}%</p>
-          `;
-          form.reset();
-        } else {
-          const errorData = await response.json();
-          resultadoDiv.textContent = "❌ Error al enviar: " + (errorData.message || response.statusText);
-        }
-      } catch (err) {
-        resultadoDiv.textContent = "❌ Error al enviar: " + err.message;
-      } finally {
-        // 恢复按钮
-        submitBtn.disabled = false;
-        submitBtn.textContent = "Enviar";
-      }
-    });
-  </script>
-</body>
-</html>
+      // 准备发送数据
+      const data = {
+        nombre,
+        sexo,
+        edad,
+        altura,
+        peso,
+        imc: imc.toFixed(2),
+        grasa: grasa.toFixed(2)
