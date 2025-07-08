@@ -128,16 +128,20 @@
         grasa: grasa.toFixed(2)
       };
 
+      const formData = new FormData();
+      formData.append("data", JSON.stringify(data));
+
       fetch("https://script.google.com/macros/s/AKfycbx6Azg41g3YFDmUXX7UsjampaYvTEwehnYrX8sfQfiPXeMLT6Mi8Y-NOJ6dqp1kSU0m/exec", {
         method: "POST",
-        body: JSON.stringify(data),
-        headers: {
-          "Content-Type": "application/json"
-        }
+        body: formData
       })
       .then(response => response.json())
       .then(res => {
-        resultadoDiv.innerHTML += "<p>✅ ¡Datos enviados y guardados como PDF en Google Drive!</p>";
+        if (res.status === "success") {
+          resultadoDiv.innerHTML += "<p>✅ ¡Datos enviados y guardados como PDF en Google Drive!</p>";
+        } else {
+          resultadoDiv.innerHTML += `<p>❌ Error del servidor: ${res.message}</p>`;
+        }
       })
       .catch(error => {
         console.error("Error:", error);
