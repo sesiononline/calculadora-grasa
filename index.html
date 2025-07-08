@@ -3,54 +3,53 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Calculadora de Grasa Corporal</title>
+  <title>Calculadora de Grasa Corporal - FC Grama</title>
   <style>
-    body::before {
-      content: "";
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background-image: url("https://sesiononline.github.io/calculadora-grasa/FC%20Grama.png");
-      background-size: 400px;
-      background-repeat: no-repeat;
-      background-position: center;
-      opacity: 0.1;
-      width: 100%;
-      height: 100%;
-      z-index: 0;
-    }
-
     body {
       font-family: Arial, sans-serif;
       max-width: 600px;
       margin: 40px auto;
       padding: 20px;
-      background-color: rgba(255, 255, 255, 0.9);
+      background-color: #f9f9f9;
       border-radius: 12px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
       position: relative;
       z-index: 1;
     }
 
+    body::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-image: url("FC%20Grama.png");
+      background-size: 400px;
+      background-repeat: no-repeat;
+      background-position: center;
+      opacity: 0.08;
+      pointer-events: none;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+
     h1 {
       text-align: center;
       color: #333;
     }
-
     label {
       display: block;
       margin-top: 15px;
       font-weight: bold;
     }
-
     input, select, button {
       width: 100%;
       padding: 10px;
       margin-top: 5px;
       font-size: 16px;
+      box-sizing: border-box;
     }
-
     button {
       background-color: #4CAF50;
       color: white;
@@ -59,11 +58,9 @@
       cursor: pointer;
       border-radius: 5px;
     }
-
     button:hover {
       background-color: #45a049;
     }
-
     #resultado {
       margin-top: 20px;
       padding: 15px;
@@ -118,7 +115,7 @@
       resultadoDiv.innerHTML = `
         <p><strong>IMC:</strong> ${bmi.toFixed(2)}</p>
         <p><strong>% de Grasa Corporal:</strong> ${grasa.toFixed(2)}%</p>
-        <p>📄 El resultado se está guardando como PDF...</p>
+        <p>📨 Enviando a Google Drive...</p>
       `;
 
       const data = {
@@ -131,20 +128,20 @@
         grasa: grasa.toFixed(2)
       };
 
-      const url = "https://script.google.com/macros/s/AKfycbxjn8jVXyVwDAhR-6mP9VtlzorzB97-llIfjZLINhJAnFniKD5K1LsAp_rxD-Bjvx7d/exec";
-
-      fetch(url, {
+      fetch("https://script.google.com/macros/s/AKfycbxjn8jVXyVwDAhR-6mP9VtlzorzB97-llIfjZLINhJAnFniKD5K1LsAp_rxD-Bjvx7d/exec", {
         method: "POST",
-        mode: "no-cors",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify(data),
-      }).then(() => {
-        resultadoDiv.innerHTML += `<p>✅ Guardado en Google Drive correctamente.</p>`;
-      }).catch((error) => {
-        resultadoDiv.innerHTML += `<p>❌ Error al guardar en Google Drive.</p>`;
-        console.error(error);
+        headers: {
+          "Content-Type": "application/json"
+        }
+      })
+      .then(response => response.json())
+      .then(res => {
+        resultadoDiv.innerHTML += "<p>✅ ¡Datos enviados y guardados como PDF en Google Drive!</p>";
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        resultadoDiv.innerHTML += "<p>❌ Error al enviar a Google Drive. Inténtalo más tarde.</p>";
       });
     });
   </script>
